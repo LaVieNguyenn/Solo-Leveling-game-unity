@@ -1593,22 +1593,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waves:
-  - enemyPrefab: {fileID: 8284610609497238385, guid: 6f7de385455310e4b986757a7606f20c, type: 3}
+  - enemyPrefab: {fileID: 1518221969717499553, guid: 8a55204a53a0de3489f7c1e23e1f90f7, type: 3}
     spawnTimer: 0
     spawnInterval: 0.9
     enemiesPerWave: 30
     spawnedEnemyCount: 0
-  - enemyPrefab: {fileID: 3461690725988920738, guid: 7fb422a6215cad8439103df281dc40a1, type: 3}
+  - enemyPrefab: {fileID: 6609877686208500734, guid: 5b21a570556b539409631ac9667dbcdc, type: 3}
     spawnTimer: 0
     spawnInterval: 1
     enemiesPerWave: 30
     spawnedEnemyCount: 0
-  - enemyPrefab: {fileID: 40043641672547100, guid: 3a7008591fb91c44bb7add1c03f4a1bf, type: 3}
+  - enemyPrefab: {fileID: 895813756664394062, guid: 3336b53878721294eb5f4ed607a02c40, type: 3}
     spawnTimer: 0
     spawnInterval: 1
     enemiesPerWave: 30
     spawnedEnemyCount: 0
-  - enemyPrefab: {fileID: 9166857696172220877, guid: f7689c3f70a8d49469dc5e4c1082f5c7, type: 3}
+  - enemyPrefab: {fileID: 2431029189513641542, guid: f3a04e4640605f04883652ad85f1748b, type: 3}
     spawnTimer: 0
     spawnInterval: 1
     enemiesPerWave: 1
@@ -3067,6 +3067,8 @@ MonoBehaviour:
   immunityDuration: 1
   immunityTimer: 0
   skillEffectPrefab: {fileID: 7696215163677698524, guid: a871fbeb9e8add44a8340f6138cb468c, type: 3}
+  skillCooldown: 40
+  skillDamage: 100
   playerLevels: 0a000000140000001e000000
 --- !u!70 &641978574
 CapsuleCollider2D:
