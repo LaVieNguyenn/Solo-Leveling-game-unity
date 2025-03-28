@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Nova pasta_17-12_0: -1643441157027861986
+      Nova pasta_17-12_1: 8587534500060435113
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
