@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -27,7 +28,20 @@ public class PlayerController : MonoBehaviour
     private bool isImmune;
     [SerializeField] private float immunityDuration;
     [SerializeField] private float immunityTimer;
+ 
+    private Animator skillAnimator;
 
+ 
+
+    public GameObject skillEffectPrefab; // Gán trong Inspector
+    private GameObject skillEffectInstance;
+
+    //Biến cooldown cho Skill R
+    [SerializeField] private float skillCooldown = 40f;
+    private float lastSkillTime = -40f;
+
+    //Biến sát thương cho Skill R
+    [SerializeField] private float skillDamage = 100f;
     public List<int> playerLevels;
     
     void Awake(){
@@ -47,6 +61,16 @@ public class PlayerController : MonoBehaviour
         UIController.Instance.UpdateHealthSlider();
         UIController.Instance.UpdateExperienceSlider();
         AddWeapon(Random.Range(0, inactiveWeapons.Count));
+
+        if (skillEffectPrefab != null)
+        {
+            skillEffectInstance = Instantiate(skillEffectPrefab, transform.position, Quaternion.identity);
+            skillEffectInstance.SetActive(false); // Ẩn đi ban đầu
+        }
+        else
+        {
+            Debug.LogError("skillEffectPrefab chưa được gán! Kéo Prefab vào Inspector.");
+        }
     }
 
     // Update is called once per frame
@@ -70,7 +94,89 @@ public class PlayerController : MonoBehaviour
         } else {
             isImmune = false;
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (Time.time - lastSkillTime >= skillCooldown)
+            {
+                lastSkillTime = Time.time;
+                SkillVideoController.Instance.PlaySkillVideo(); // Phát video trước khi thực hiện skill
+            }
+            else
+            {
+                Debug.Log("Skill R đang hồi chiêu! Thời gian còn lại: " + Mathf.Ceil(skillCooldown - (Time.time - lastSkillTime)) + " giây");
+            }
+        }
     }
+
+
+
+    public void UseSkill()
+    {
+        Debug.Log("Nhân vật sử dụng kỹ năng R!");
+
+        // Xoay hướng animation dựa vào hướng di chuyển cuối cùng
+        if (lastMoveDirection.x < 0) // Nếu di chuyển trái
+        {
+            transform.localScale = new Vector3(-1, 1, 1); // Lật trái
+        }
+        else if (lastMoveDirection.x > 0) // Nếu di chuyển phải
+        {
+            transform.localScale = new Vector3(1, 1, 1); // Giữ hướng phải
+        }
+
+        animator.SetTrigger("useSkill");
+
+        if (skillEffectInstance != null)
+        {
+            skillEffectInstance.SetActive(true);
+            skillEffectInstance.transform.position = transform.position; // Đặt hiệu ứng ở vị trí nhân vật
+            StartCoroutine(HideSkillEffect(0.5f)); // Ẩn sau 0.5s
+        }
+
+        StartCoroutine(ResetSkillAnimation()); // Reset Animation
+        // Gây sát thương khi kích hoạt kỹ năng
+        DealSkillDamage();
+    }
+
+
+    // Gây sát thương khi sử dụng kỹ năng
+    private void DealSkillDamage()
+    {
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, 5f); // Bán kính 5 đơn vị
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+            if (enemyScript != null)
+            {
+                enemyScript.TakeDamage(skillDamage);
+            }
+        }
+
+        Debug.Log("Skill R gây " + skillDamage + " sát thương lên kẻ địch xung quanh!");
+    }
+
+
+
+
+    IEnumerator HideSkillEffect(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        skillEffectInstance.SetActive(false);
+    }
+
+
+    IEnumerator ResetSkillAnimation()
+    {
+        yield return new WaitForSeconds(0.5f); // Thời gian dựa trên Animation
+        animator.ResetTrigger("useSkill");
+    }
+
+
+
+
+
 
     void FixedUpdate(){
         rb.linearVelocity = new Vector3(playerMoveDirection.x * moveSpeed, playerMoveDirection.y * moveSpeed);

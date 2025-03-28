@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public class EnemySpawner : MonoBehaviour
 {
     [System.Serializable]
-    public class Wave {
+    public class Wave
+    {
         public GameObject enemyPrefab;
         public float spawnTimer;
         public float spawnInterval;
@@ -18,44 +19,60 @@ public class EnemySpawner : MonoBehaviour
 
     void Update()
     {
-        if (PlayerController.Instance.gameObject.activeSelf){
+        if (PlayerController.Instance.gameObject.activeSelf)
+        {
             waves[waveNumber].spawnTimer += Time.deltaTime;
-            if (waves[waveNumber].spawnTimer >= waves[waveNumber].spawnInterval){
+            if (waves[waveNumber].spawnTimer >= waves[waveNumber].spawnInterval)
+            {
                 waves[waveNumber].spawnTimer = 0;
                 SpawnEnemy();
             }
-            if (waves[waveNumber].spawnedEnemyCount >= waves[waveNumber].enemiesPerWave){
+            if (waves[waveNumber].spawnedEnemyCount >= waves[waveNumber].enemiesPerWave)
+            {
                 waves[waveNumber].spawnedEnemyCount = 0;
-                if (waves[waveNumber].spawnInterval > 0.15f){
+                if (waves[waveNumber].spawnInterval > 0.15f)
+                {
                     waves[waveNumber].spawnInterval *= 0.8f;
                 }
                 waveNumber++;
             }
-            if (waveNumber >= waves.Count){
+            if (waveNumber >= waves.Count)
+            {
                 waveNumber = 0;
             }
         }
     }
 
-    private void SpawnEnemy(){
+    private void SpawnEnemy()
+    {
         Instantiate(waves[waveNumber].enemyPrefab, RandomSpawnPoint(), transform.rotation);
         waves[waveNumber].spawnedEnemyCount++;
     }
 
-    private Vector2 RandomSpawnPoint(){
+    private Vector2 RandomSpawnPoint()
+    {
         Vector2 spawnPoint;
-        if (Random.Range(0f, 1f) > 0.5){
+        if (Random.Range(0f, 1f) > 0.5)
+        {
             spawnPoint.x = Random.Range(minPos.position.x, maxPos.position.x);
-            if (Random.Range(0f, 1f) > 0.5){
+            if (Random.Range(0f, 1f) > 0.5)
+            {
                 spawnPoint.y = minPos.position.y;
-            } else {
+            }
+            else
+            {
                 spawnPoint.y = maxPos.position.y;
             }
-        } else {
+        }
+        else
+        {
             spawnPoint.y = Random.Range(minPos.position.y, maxPos.position.y);
-            if (Random.Range(0f, 1f) > 0.5){
+            if (Random.Range(0f, 1f) > 0.5)
+            {
                 spawnPoint.x = minPos.position.x;
-            } else {
+            }
+            else
+            {
                 spawnPoint.x = maxPos.position.x;
             }
         }
