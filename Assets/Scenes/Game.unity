@@ -1987,6 +1987,7 @@ GameObject:
   - component: {fileID: 516463770}
   - component: {fileID: 516463771}
   - component: {fileID: 516463776}
+  - component: {fileID: 516463777}
   m_Layer: 6
   m_Name: SungJinWoo
   m_TagString: Player
@@ -2185,6 +2186,20 @@ MonoBehaviour:
   skillCooldown: 40
   skillDamage: 100
   playerLevels: 0a000000140000001e000000
+--- !u!114 &516463777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516463768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859497104cdade944a1e05cc5e9d7c74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 516463773}
+  spriteRenderer: {fileID: 516463774}
 --- !u!1 &518419558
 GameObject:
   m_ObjectHideFlags: 0
