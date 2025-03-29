@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelUpButton : MonoBehaviour
@@ -32,6 +33,11 @@ public class LevelUpButton : MonoBehaviour
         }
 
         UIController.Instance.LevelUpPanelClose();
-        AudioController.Instance.PlaySound(AudioController.Instance.selectUpgrade);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int totalScenes = SceneManager.sceneCountInBuildSettings;
+
+        int nextSceneIndex = (currentSceneIndex + 1 >= totalScenes) ? 0 : currentSceneIndex + 1;
+
+        SceneManager.LoadSceneAsync(nextSceneIndex);
     }
 }

@@ -78,6 +78,7 @@ public class PlayerController : MonoBehaviour
             Destroy(this);
         } else {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -394,7 +395,18 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(DestroyMonsterAfterAnimation());
     }
 
-
+    public void TrapMakeDecreaseSpeed(float multiplier)
+    {
+        {
+            moveSpeed /= multiplier;
+        }
+    }
+    public void TrapMakeIncreaseSpeed(float multiplier)
+    {
+        {
+            moveSpeed *= multiplier;
+        }
+    }
     private void DealDamageAround()
     {
         Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, skillIRadius);
