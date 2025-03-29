@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator animator;
 
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float runMultiplier = 2f; 
+    private float currentMoveSpeed;
     public Vector3 playerMoveDirection;
     public Vector3 lastMoveDirection;
     public float playerMaxHealth;
@@ -19,6 +21,19 @@ public class PlayerController : MonoBehaviour
     public int experience;
     public int currentLevel;
     public int maxLevel;
+    public bool _isFacingRight = true;
+
+    public bool IsFacingRight { get { return _isFacingRight; } private set
+        {
+            if (_isFacingRight != value)
+            {
+                transform.localScale *= new Vector2(-1, 1);
+            }
+
+            _isFacingRight = value;
+        }
+        }
+
 
     [SerializeField] private List<Weapon> inactiveWeapons;
     public List<Weapon> activeWeapons;
@@ -43,6 +58,7 @@ public class PlayerController : MonoBehaviour
     //Biến sát thương cho Skill R
     [SerializeField] private float skillDamage = 100f;
     public List<int> playerLevels;
+
     
     void Awake(){
         if (Instance != null && Instance != this){
@@ -82,11 +98,27 @@ public class PlayerController : MonoBehaviour
 
         if (playerMoveDirection == Vector3.zero){
             animator.SetBool("moving", false);
-        } else if (Time.timeScale != 0) {
+            SetFacingDirection(playerMoveDirection);
+
+
+        }
+        else if (Time.timeScale != 0) {
             animator.SetBool("moving", true);
             animator.SetFloat("moveX", inputX);
             animator.SetFloat("moveY", inputY);
             lastMoveDirection = playerMoveDirection;
+            SetFacingDirection(playerMoveDirection);
+        }
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
+            currentMoveSpeed = moveSpeed * runMultiplier;
+            animator.SetBool("running", true);
+        }
+        else
+        {
+            currentMoveSpeed = moveSpeed;
+            animator.SetBool("running", false);
         }
 
         if (immunityTimer > 0){
@@ -109,7 +141,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    private void SetFacingDirection(Vector3 playerMoveDirection)
+    {
+        if (playerMoveDirection.x > 0 && !IsFacingRight)
+        {
+            IsFacingRight = true;
+        }else if(playerMoveDirection.x < 0 && IsFacingRight)
+        {
+            IsFacingRight = false;
+        }
+    }
 
     public void UseSkill()
     {
@@ -174,12 +215,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
-
-
-
-    void FixedUpdate(){
-        rb.linearVelocity = new Vector3(playerMoveDirection.x * moveSpeed, playerMoveDirection.y * moveSpeed);
+    void FixedUpdate()
+    {
+        rb.linearVelocity = playerMoveDirection * currentMoveSpeed;
     }
 
     public void TakeDamage(float damage){
