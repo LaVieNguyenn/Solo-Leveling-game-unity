@@ -18,6 +18,16 @@ public class PlayerController : MonoBehaviour
     public float playerMaxHealth;
     public float playerHealth;
 
+
+    public GameObject skillBeru; // Kéo prefab quái vật vào đây
+    private GameObject monsterInstance;
+    public AudioSource skillIAudio; // Kéo AudioSource
+
+
+    public GameObject skillTusk; // Kéo prefab quái vật vào đây
+
+    private float cooldownU = 5f;
+
     public int experience;
     public int currentLevel;
     public int maxLevel;
@@ -45,11 +55,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float immunityTimer;
  
     private Animator skillAnimator;
+    private bool canMove = true;
 
- 
 
     public GameObject skillEffectPrefab; // Gán trong Inspector
     private GameObject skillEffectInstance;
+    private GameObject skillIEffectInstance;
 
     //Biến cooldown cho Skill R
     [SerializeField] private float skillCooldown = 40f;
@@ -59,7 +70,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float skillDamage = 100f;
     public List<int> playerLevels;
 
-    
+    public float skillIRadius = 3f; // Bán kính sát thương I
+    public int skillIDamage = 50;   // Sát thương gây ra I
+
     void Awake(){
         if (Instance != null && Instance != this){
             Destroy(this);
@@ -99,8 +112,6 @@ public class PlayerController : MonoBehaviour
         if (playerMoveDirection == Vector3.zero){
             animator.SetBool("moving", false);
             SetFacingDirection(playerMoveDirection);
-
-
         }
         else if (Time.timeScale != 0) {
             animator.SetBool("moving", true);
@@ -138,6 +149,15 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Skill R đang hồi chiêu! Thời gian còn lại: " + Mathf.Ceil(skillCooldown - (Time.time - lastSkillTime)) + " giây");
             }
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            UseSkillI();
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            UseSkillU();
         }
     }
 
@@ -199,7 +219,18 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private IEnumerator DestroyMonsterAfterAnimation()
+    {
+        Animator monsterAnimator = monsterInstance.GetComponent<Animator>();
 
+        // Chờ đến khi animation kết thúc
+        yield return new WaitForSeconds(monsterAnimator.GetCurrentAnimatorStateInfo(0).length);
+
+        Destroy(monsterInstance); // Xóa quái vật
+        isImmune = false;
+        canMove = true; // Cho phép nhân vật di chuyển lại
+
+    }
 
     IEnumerator HideSkillEffect(float delay)
     {
@@ -211,6 +242,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator ResetSkillAnimation()
     {
         yield return new WaitForSeconds(0.5f); // Thời gian dựa trên Animation
+        canMove = true;
         animator.ResetTrigger("useSkill");
     }
 
@@ -293,5 +325,88 @@ public class PlayerController : MonoBehaviour
 
         UIController.Instance.LevelUpPanelClose();
         AudioController.Instance.PlaySound(AudioController.Instance.selectUpgrade);
+    }
+
+    public void UseSkillI()
+    {
+        if (!canMove) return; // Nếu đang dùng kỹ năng khác thì không làm gì
+
+        Debug.Log("🔥 Triệu hồi quái vật!");
+
+        // Nhân vật đứng yên
+        canMove = false;
+        rb.linearVelocity = Vector2.zero; // Dừng chuyển động
+
+        // Kiểm tra prefab đã gán chưa
+        if (skillBeru == null)
+        {
+            Debug.LogError("⚠ MonsterPrefab chưa được gán trong Inspector!");
+            return;
+        }
+
+        // Phát âm thanh khi kích hoạt kỹ năng
+        if (skillIAudio != null)
+        {
+            Debug.Log("🔊 Đang phát âm thanh skill I!");
+            skillIAudio.Play();
+        }
+        else
+        {
+            Debug.LogError("❌ Không tìm thấy AudioSource cho skill I!");
+        }
+
+        // Triệu hồi quái vật
+        monsterInstance = Instantiate(skillBeru, transform.position + new Vector3(1, 0, 0), Quaternion.identity);
+
+        // Gây sát thương xung quanh nhân vật
+        DealDamageAround();
+
+
+        // Bắt đầu coroutine chờ animation kết thúc
+        StartCoroutine(DestroyMonsterAfterAnimation());
+    }
+
+    public void UseSkillU()
+    {
+        if (!canMove) return; // Nếu đang dùng kỹ năng khác thì không làm gì
+
+        Debug.Log("🔥 Triệu hồi quái vật!");
+
+        // Nhân vật đứng yên
+        canMove = false;
+        rb.linearVelocity = Vector2.zero; // Dừng chuyển động
+
+        // Kiểm tra prefab đã gán chưa
+        if (skillTusk == null)
+        {
+            Debug.LogError("⚠ MonsterPrefab chưa được gán trong Inspector!");
+            return;
+        }
+
+        //kich hoat bat tu
+        isImmune = true;
+
+        // Triệu hồi quái vật
+        monsterInstance = Instantiate(skillTusk, transform.position + new Vector3(1, 0, 0), Quaternion.identity);
+
+
+        // Bắt đầu coroutine chờ animation kết thúc
+        StartCoroutine(DestroyMonsterAfterAnimation());
+    }
+
+
+    private void DealDamageAround()
+    {
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, skillIRadius);
+
+        foreach (Collider2D enemy in enemies)
+        {
+            Enemy enemyComponent = enemy.GetComponent<Enemy>();
+            if (enemyComponent != null)
+            {
+                enemyComponent.TakeDamage(skillIDamage);
+                Debug.Log($" Gây {skillIDamage} sát thương lên {enemy.name}");
+            }
+        }
     }
 }
